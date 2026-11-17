@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+	<head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+	
+		<title>Positions</title>
+		<style>
+	        html, body { height: 100%; margin: 0;}
+	        body { display: flex; flex-direction: column; min-height: 100vh; }
+	        main { flex: 1; }
+	        footer { background-color: #f5f5f5; padding: 1em; text-align: center; }
+	    </style>
+	</head>
+	
+	<body>
+	    <main class="container">
+	        <h2>Positions</h2>
+	        <hr>
+			<table class="table table-bordered">
+				<thead>
+					<tr>
+						<th>Title</th>
+						<th>Description</th>
+						<th>From - To</th>
+						<th>Required Skills</th>
+						<th>Topics of interests</th>
+						<th>Student</th>
+						<th>Logbook</th>
+						<th>Pass/Fail</th>
+						<th>Evaluation Company</th>
+						<th>Evaluation Professor</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				
+				<tbody>
+					<tr th:each="position : ${positions}">
+						<td th:text="${position.title}"/>
+						<td th:text="${position.description}"/>
+						 <td>
+						 	<span th:text="${#temporals.format(position.fromDate, 'dd/MM/yyyy')}"></span> - <span th:text="${#temporals.format(position.toDate, 'dd/MM/yyyy')}"></span>
+						</td>
+						<td>
+							<ul class="mb-0">
+								<li th:each="skill : ${position.skills}" th:text="${skill.name}"></li>
+							</ul>
+						</td>
+						<td>
+							<ul class="mb-0">
+								<li th:each="topic : ${position.topics}" th:text="${topic.name}"></li>
+							</ul>
+						</td>
+						<td th:if="${position.student!=null}">
+							<a th:href="@{/company/showStudent(studentUsername=${position.student.username},backUrl=${'/company/assignedPositions'})}" th:text="${position.student.name}"></a>
+						</td>
+						<td th:if="${position.student==null}">
+							Not assigned
+						</td>
+						<td th:if="${position.studentLogbook!=null}" th:text="${position.studentLogbook}"/>
+						<td th:if="${position.studentLogbook==null}" th:text="${'-'}"/>
+						<td th:if="${position.isCompleted==false}" th:text="${'Pending'}"/>
+						<td th:if="${position.isCompleted==true && position.passFailGrade==true}" th:text="${'Pass'}"/>
+						<td th:if="${position.isCompleted==true && position.passFailGrade==false}" th:text="${'Fail'}"/>
+						<td th:if="${position.isEvaluatedByCompany==true}">
+						    <strong>Company:</strong>
+						    <div th:with="companyEvals=${position.evaluations.?[evaluationType.name() == 'FROM_COMPANY']}">
+						        <div th:with="eval=${companyEvals[0]}">
+						        	<ul class="mb-0">
+						        		<li>Motivation: <span th:text="${eval.motivation}"></span></li>
+						        		<li>Efficiency: <span th:text="${eval.efficiency}"></span></li>
+						        		<li>Effectiveness: <span th:text="${eval.effectiveness}"></span></li>
+						             </ul>
+						        </div>
+						    </div>
+						</td>
+						<td th:if="${position.isEvaluatedByCompany==false}">
+							Pending
+						</td>
+						<td th:if="${position.isEvaluatedByProfessor==true}">
+						    <strong>Professor:</strong>
+						    <div th:with="professorEvals=${position.evaluations.?[evaluationType.name() == 'FROM_PROFESSOR']}">
+						        <div th:with="eval=${professorEvals[0]}">
+						        	<ul class="mb-0">
+						        		<li>Motivation: <span th:text="${eval.motivation}"></span></li>
+						        		<li>Efficiency: <span th:text="${eval.efficiency}"></span></li>
+						        		<li>Effectiveness: <span th:text="${eval.effectiveness}"></span></li>
+						        		<li>Facilities: <span th:text="${eval.facilities}"></span></li>
+						        		<li>Guidance: <span th:text="${eval.guidance}"></span></li>
+						             </ul>
+						        </div>
+						    </div>
+						</td>
+						<td th:if="${position.isEvaluatedByProfessor==false}">
+							Pending
+						</td>
+						<td>
+							<a th:if="${position.isAssigned==false}" th:href="@{/company/deletePosition(positionId=${position.id})}" class="btn btn-danger btn-sm" onclick="if (!(confirm('Are you sure you want to delete this position?'))) return false">Delete</a>
+							<a th:if="${position.isAssigned==true && position.isEvaluatedByCompany==false}" th:href="@{/company/evaluateAssignedTraineeship(positionId=${position.id})}" class="btn btn-primary btn-sm">Evaluate</a>
+						</td>
+					</tr>
+				</tbody>		
+			</table>
+	
+	        <br><br><hr><br><br>
+	
+	        <p>
+	            <a href="/company/dashboard" class="btn btn-outline-primary btn-sm mb-3">← Dashboard</a>
+	        </p>
+	    </main>
+	
+	    <footer class="container">
+	        <p>&copy; 2025 Traineeship Management Application. All rights reserved.</p>
+	    </footer>
+	</body>
+</html>
