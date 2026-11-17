@@ -18,6 +18,10 @@ The application is designed to facilitate the management of university traineesh
 
 ## Technologies
 
-- Java
-- Spring Boot
-
+- Java 17
+- Spring Boot 3.2.2
+- Spring Security
+- Spring Data JPA
+- Thymeleaf
+- MySQL
+- Maven
